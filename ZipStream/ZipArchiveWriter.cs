@@ -6,9 +6,9 @@ using System.Text;
 
 namespace ZipStream
 {
-    public class ZipArchive : IDisposable
+    public class ZipArchiveWriter : IDisposable
     {
-        static ZipArchive()
+        static ZipArchiveWriter()
         {
             make_crc_table();
         }
@@ -20,7 +20,7 @@ namespace ZipStream
         ulong fileCount;
         ulong cd_start_position;
 
-        public ZipArchive(Stream output)
+        public ZipArchiveWriter(Stream output)
         {
             this.output = output;
         }
@@ -265,9 +265,10 @@ namespace ZipStream
                 0x00,
                 0x00, // number of the disk with the start of the central directory
             };
-            var num = cnt.Slice(4);
-            var size = cd_size.Slice(4);
+            var num = cnt.Slice(0, 2);
+            var size = cd_size.Slice(0, 4);
             output.Write(head);
+            output.Write(num);
             output.Write(num);
             output.Write(size);
             size[0] = 0xff;
